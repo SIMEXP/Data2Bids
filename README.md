@@ -1,6 +1,6 @@
-# Raw2Bids
+# Format2BIDS
 
-Raw2Bids reorganises raw files from any extension into the [Brain Imaging Data Structure](http://bids.neuroimaging.io/).
+Format2BIDS reorganises raw files from any extension into the [Brain Imaging Data Structure](http://bids.neuroimaging.io/).
 The user specify how the files should be read into a directory. Then the tool scan all the files and move them into the right directories.
 
 ###### Input
