@@ -285,7 +285,7 @@ def main():
                     delayTime = delayTime * TR
                     data = {'RepetitionTime': TR,
                             'TaskName': taskLabelMatch,
-                            'DelayTime' : 0.05*TR}
+                            'DelayTime' : delayTime}
                     json.dump(data, fst, ensure_ascii=False)
             
     # Output
