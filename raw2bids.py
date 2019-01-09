@@ -13,7 +13,7 @@ import nibabel as nib
 import numpy as np
 
 """
-to test:
+another way to do it:
 
 https://github.com/MounaSafiHarab/Loris-MRI/blob/9b7c299006378d54c9b457d8e1c1a3c71eaf4176/tools/MakeNiiFilesBIDSCompliant.pl
 """
