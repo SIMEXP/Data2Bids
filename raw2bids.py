@@ -259,16 +259,19 @@ def main():
                 
                 # create the nifti1 image
                 # if minc format, invert the data and change the affine transformation (TO CHECK !)
-                if( (file[-4::] == ".mnc") & (len(nibImg.shape)>3)):
-                    nibAffine[0:3, 0:3] = nibAffine[0:3, 0:3] @ rotZ(np.pi/2) @ rotY(np.pi) @ rotX(np.pi/2)
-                    nibData = nibData.T
-                    nibData = np.swapaxes(nibData, 0, 1)
+                if( file[-4::] == ".mnc" ):
+                    if( len(nibImg.shape) > 3):
+                        nibAffine[0:3, 0:3] = nibAffine[0:3, 0:3] @ rotZ(np.pi/2) @ rotY(np.pi) @ rotX(np.pi/2)
+                        nibData = nibData.T
+                        nibData = np.swapaxes(nibData, 0, 1)
                     
-                    niftiImg = nib.Nifti1Image(nibData, nibAffine, nibImg.header)
-                    niftiImg.header.set_xyzt_units(xyz="mm", t="sec")
+                        niftiImg = nib.Nifti1Image(nibData, nibAffine, nibImg.header)
+                        niftiImg.header.set_xyzt_units(xyz="mm", t="sec")
+                    elif( len(nibImg.shape) == 3):
+                        niftiImg = nib.Nifti1Image(nibData, nibAffine, nibImg.header)
+                        niftiImg.header.set_xyzt_units(xyz="mm")
                 else:
                     niftiImg = nib.Nifti1Image(nibData, nibAffine, nibImg.header)
-                    niftiImg.header.set_xyzt_units(xyz="mm")
                 
                 #saving the image
                 nib.save(niftiImg, dstFilePath + newName)
@@ -283,9 +286,9 @@ def main():
                 TR = nibImg.header.get_zooms()[3]
                 with open(dstFilePath + newName[:-4] + ".json", 'w') as fst:
                     delayTime = delayTime * TR
-                    data = {'RepetitionTime': TR,
+                    data = {'RepetitionTime': float(TR),
                             'TaskName': taskLabelMatch,
-                            'DelayTime' : delayTime}
+                            'DelayTime' : float(delayTime)}
                     json.dump(data, fst, ensure_ascii=False)
             
     # Output
