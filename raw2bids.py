@@ -151,6 +151,9 @@ def main():
     datasetName = os.path.basename(pathDir)
     bidsVersion = "1.1.1"
     
+    # What is the base format to convert to
+    currExt = ".mnc"
+    
     dataType = cDataType()
 #   According to  https://bids.neuroimaging.io/bids_spec.pdf
     
@@ -171,6 +174,11 @@ def main():
     
     #patient-id, with regexp 4 times
     partLabel = "[0-9]{6}"
+    
+    # optionnal scanner parameters
+    
+    # delay time in TR unit (if delayTime = 1, delayTime = repetitionTime)
+    delayTime = 0.05
     
     # creating the output dir
     outDir = os.path.dirname(pathDir) + '/' + datasetName + "_BIDS"
@@ -194,28 +202,29 @@ def main():
             dstFilePath = outDir
             
             # Matching the participent number
-            if re.match(".*?" + delimiter + '(' + partLabel + ')' + delimiter + ".*?", file):
-                partMatch = re.match(".*?" + delimiter + '(' + partLabel + ')' + delimiter + ".*?", file)[1]
+            if re.match(".*?" + delimiter + '(' + partLabel + ')' + delimiter + ".*?" + currExt, file):
+                partMatch = re.match(".*?" + delimiter + '(' + partLabel + ')' + delimiter + ".*?" + currExt, file)[1]
                 dstFilePath = dstFilePath + "/sub-" + partMatch
             
             # Matching the session label
             for toMatch in sessLabel:
-                if re.match(".*?" + delimiter + ".*?" + '(' + toMatch + ')' + delimiter + ".*?", file):
-                    sessMatch = re.match(".*?" + delimiter + ".*?" + '(' + toMatch + ')' + delimiter + ".*?", file)[1]
+                if re.match(".*?" + delimiter + ".*?" + '(' + toMatch + ')' + delimiter + ".*?" + currExt, file):
+                    sessMatch = re.match(".*?" + delimiter + ".*?" + '(' + toMatch + ')' + delimiter + ".*?" + currExt, file)[1]
                     dstFilePath = dstFilePath + "/ses-" + sessMatch
                 else:
                     continue
             
             # Matching the data type
+            dataTypeMatch=None
             for toMatch in dataType.anat:
-                if re.match(".*?" + delimiter + '(' + toMatch + ')' + delimiter + ".*?", file):
+                if re.match(".*?" + delimiter + '(' + toMatch + ')' + delimiter + ".*?" + currExt, file):
                     dataTypeMatch = "T1w"
                     dstFilePath = dstFilePath + "/anat"
                 else:
                     continue
             
             for toMatch in dataType.func:
-                if re.match(".*?" + delimiter + '(' + toMatch + ')' + delimiter + ".*?", file):
+                if re.match(".*?" + delimiter + '(' + toMatch + ')' + delimiter + ".*?" + currExt, file):
                     dataTypeMatch = "bold"
                     dstFilePath = dstFilePath + "/func"
                 #### Here the part for resting task
@@ -224,8 +233,8 @@ def main():
                     continue
             
             # Matching the run number
-            if re.match(".*?" + delimiter + '(' + runIndex + ')' + '\.' + ".*?", file):
-                runMatch = re.match(".*?" + delimiter + '(' + runIndex + ')' + '\.' + ".*?", file)[1]
+            if re.match(".*?" + delimiter + '(' + runIndex + ')' + currExt, file):
+                runMatch = re.match(".*?" + delimiter + '(' + runIndex + ')' + currExt, file)[1]
                 
             # Creating the directory
             if not os.path.exists(dstFilePath):
@@ -234,8 +243,11 @@ def main():
             # copying and renaming the file
             if dataTypeMatch == "T1w":
                 newName = "/sub-" + partMatch + "_ses-" + sessMatch + "_T1w.nii"
-            else:
+            elif dataTypeMatch == "bold":
                 newName = "/sub-" + partMatch + "_ses-" + sessMatch + "_task-" + taskLabelMatch + "_bold.nii"
+            # if the file is not recognized, we simply continue the process
+            else:
+                continue
                 
             # finally, if the file is not nifti, we convert it using nibabel
             if file[-4::] != ".nii":
@@ -252,7 +264,11 @@ def main():
                     nibData = nibData.T
                     nibData = np.swapaxes(nibData, 0, 1)
                     
-                niftiImg = nib.Nifti1Image(nibData, nibAffine, nibImg.header)
+                    niftiImg = nib.Nifti1Image(nibData, nibAffine, nibImg.header)
+                    niftiImg.header.set_xyzt_units(xyz="mm", t="sec")
+                else:
+                    niftiImg = nib.Nifti1Image(nibData, nibAffine, nibImg.header)
+                    niftiImg.header.set_xyzt_units(xyz="mm")
                 
                 #saving the image
                 nib.save(niftiImg, dstFilePath + newName)
@@ -266,8 +282,10 @@ def main():
                 nibImg = nib.load(srcFilePath)
                 TR = nibImg.header.get_zooms()[3]
                 with open(dstFilePath + newName[:-4] + ".json", 'w') as fst:
+                    delayTime = delayTime * TR
                     data = {'RepetitionTime': TR,
-                            'TaskName': taskLabelMatch}
+                            'TaskName': taskLabelMatch,
+                            'DelayTime' : 0.05*TR}
                     json.dump(data, fst, ensure_ascii=False)
             
     # Output
