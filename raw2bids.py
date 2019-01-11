@@ -202,15 +202,15 @@ def main():
             srcFilePath = os.path.join(root, file)
             dstFilePath = outDir
             
-            # Matching the participent number
+            # Matching the participant number
             if re.match(".*?" + delimiter + '(' + partLabel + ')' + delimiter + ".*?" + currExt, file):
-                partMatch = re.match(".*?" + delimiter + '(' + partLabel + ')' + delimiter + ".*?" + currExt, file)[1]
+                partMatch = re.match(".*?" + delimiter + '(' + partLabel + ')' + delimiter + ".*?" + currExt, file).group(1)
                 dstFilePath = dstFilePath + "/sub-" + partMatch
             
             # Matching the session label
             for toMatch in sessLabel:
                 if re.match(".*?" + delimiter + ".*?" + '(' + toMatch + ')' + delimiter + ".*?" + currExt, file):
-                    sessMatch = re.match(".*?" + delimiter + ".*?" + '(' + toMatch + ')' + delimiter + ".*?" + currExt, file)[1]
+                    sessMatch = re.match(".*?" + delimiter + ".*?" + '(' + toMatch + ')' + delimiter + ".*?" + currExt, file).group(1)
                     dstFilePath = dstFilePath + "/ses-" + sessMatch
                 else:
                     continue
@@ -235,7 +235,7 @@ def main():
             
             # Matching the run number
             if re.match(".*?" + delimiter + '(' + runIndex + ')' + currExt, file):
-                runMatch = re.match(".*?" + delimiter + '(' + runIndex + ')' + currExt, file)[1]
+                runMatch = re.match(".*?" + delimiter + '(' + runIndex + ')' + currExt, file).group(1)
                 
             # Creating the directory
             if not os.path.exists(dstFilePath):
@@ -269,7 +269,7 @@ def main():
                     
                         niftiImg = nib.Nifti1Image(nibData, nibAffine, nibImg.header)
                         niftiImg.header.set_xyzt_units(xyz="mm", t="sec")
-                        zooms = niftiImg.header.get_zooms()
+                        zooms = np.array(niftiImg.header.get_zooms())
                         zooms[3] = repetitionTime
                         niftiImg.header.set_zooms(zooms)
                     elif( len(nibImg.shape) == 3):
