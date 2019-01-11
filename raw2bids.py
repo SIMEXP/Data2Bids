@@ -178,7 +178,8 @@ def main():
     # optionnal scanner parameters
     
     # delay time in TR unit (if delayTime = 1, delayTime = repetitionTime)
-    delayTime = 0.05
+    repetitionTime = 2
+    delayTime = 0.03
     
     # creating the output dir
     outDir = os.path.dirname(pathDir) + '/' + datasetName + "_BIDS"
@@ -259,6 +260,7 @@ def main():
                 
                 # create the nifti1 image
                 # if minc format, invert the data and change the affine transformation (TO CHECK !)
+                # there is also an issue on minc headers...
                 if( file[-4::] == ".mnc" ):
                     if( len(nibImg.shape) > 3):
                         nibAffine[0:3, 0:3] = nibAffine[0:3, 0:3] @ rotZ(np.pi/2) @ rotY(np.pi) @ rotX(np.pi/2)
@@ -267,6 +269,9 @@ def main():
                     
                         niftiImg = nib.Nifti1Image(nibData, nibAffine, nibImg.header)
                         niftiImg.header.set_xyzt_units(xyz="mm", t="sec")
+                        zooms = niftiImg.header.get_zooms()
+                        zooms[3] = repetitionTime
+                        niftiImg.header.set_zooms(zooms)
                     elif( len(nibImg.shape) == 3):
                         niftiImg = nib.Nifti1Image(nibData, nibAffine, nibImg.header)
                         niftiImg.header.set_xyzt_units(xyz="mm")
