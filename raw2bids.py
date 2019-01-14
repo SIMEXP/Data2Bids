@@ -180,14 +180,13 @@ def main():
     # delay time in TR unit (if delayTime = 1, delayTime = repetitionTime)
     repetitionTime = 2
     delayTime = 0.03
+    delayTime = delayTime*repetitionTime
     
     # creating the output dir
     outDir = os.path.dirname(pathDir) + '/' + datasetName + "_BIDS"
     if os.path.exists(outDir):
-        os.system("rm -r " + outDir + "/*")
-    else:
-        os.makedirs(outDir)
-        
+        shutil.rmtree(outDir)
+    os.makedirs(outDir)
     
     #dataset_description.json must be included in the folder root foolowing BIDS specs
     
@@ -290,8 +289,7 @@ def main():
                 nibImg = nib.load(srcFilePath)
                 TR = nibImg.header.get_zooms()[3]
                 with open(dstFilePath + newName[:-4] + ".json", 'w') as fst:
-                    delayTime = delayTime * TR
-                    data = {'RepetitionTime': float(TR),
+                    data = {'RepetitionTime': float(repetitionTime),
                             'TaskName': taskLabelMatch,
                             'DelayTime' : float(delayTime)}
                     json.dump(data, fst, ensure_ascii=False)
