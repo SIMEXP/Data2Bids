@@ -163,8 +163,8 @@ def main():
     dataType.anat = list(["adniT1"])
     dataType.func = list(["Resting"])
     
-    # session label : how much visits the patient attende
-    sessLabel = list(["BL00", "EN00", "FU03", "FU12", "FU24", "FU36", "FU48"])
+    # session label : how much visits the patient attended
+    sessLabel = list(["WA00", "BL00", "EN00", "FU03", "FU12", "FU24", "FU36", "FU48"])
     
     # task label for fmri, including resting state, TO ADD
     taskLabel = None
@@ -201,6 +201,16 @@ def main():
             srcFilePath = os.path.join(root, file)
             dstFilePath = outDir
             
+            partMatch = None
+            sessMatch = None
+            dataTypeMatch = None
+            runMatch = None
+            newName = None
+            
+            # we first start by matching the extension
+            if not re.match(".*?" + currExt, file):
+                continue
+            
             # Matching the participant number
             if re.match(".*?" + delimiter + '(' + partLabel + ')' + delimiter + ".*?" + currExt, file):
                 partMatch = re.match(".*?" + delimiter + '(' + partLabel + ')' + delimiter + ".*?" + currExt, file).group(1)
@@ -215,7 +225,6 @@ def main():
                     continue
             
             # Matching the data type
-            dataTypeMatch=None
             for toMatch in dataType.anat:
                 if re.match(".*?" + delimiter + '(' + toMatch + ')' + delimiter + ".*?" + currExt, file):
                     dataTypeMatch = "T1w"
@@ -236,6 +245,15 @@ def main():
             if re.match(".*?" + delimiter + '(' + runIndex + ')' + currExt, file):
                 runMatch = re.match(".*?" + delimiter + '(' + runIndex + ')' + currExt, file).group(1)
                 
+            # if one match is missing, there is something wrong
+            if ((partMatch == None)
+                | (sessMatch == None) 
+                | (dataTypeMatch == None) 
+                | (runMatch == None)):
+                
+                print("WARNING : Missmatch for %str" %srcFilePath)
+                continue
+            
             # Creating the directory
             if not os.path.exists(dstFilePath):
                 os.makedirs(dstFilePath)
