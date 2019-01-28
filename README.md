@@ -3,7 +3,7 @@
 Data2Bids convert fmri files from any extension into [NIfTI](https://nifti.nimh.nih.gov/nifti-1/) and then make them [Brain Imaging Data Structure](http://bids.neuroimaging.io/) compliant.
 The user specify how the files should be read into a directory. Then the tool scan all the files and move them into the right directories.
 
-*Disclaimer*: This tool is intended to convert data other than [DICOM](https://www.dicomstandard.org/about/). If you have DICOM data, please use more recognized tools as [heudiconv](https://github.com/nipy/heudiconv) or [Dcm2Bids](https://github.com/cbedetti/Dcm2Bids)
+*Disclaimer*: This tool is intended to convert data **other than** [DICOM](https://www.dicomstandard.org/about/). If you have DICOM data, please use more recognized tools as [heudiconv](https://github.com/nipy/heudiconv) or [Dcm2Bids](https://github.com/cbedetti/Dcm2Bids)
 
 ###### Input
 
