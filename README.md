@@ -1,6 +1,6 @@
-# Format2BIDS
+# Data2Bids
 
-Format2BIDS reorganises raw files from any extension into the [Brain Imaging Data Structure](http://bids.neuroimaging.io/).
+Data2Bids convert fmri files from any extension into [NIfTI](https://nifti.nimh.nih.gov/nifti-1/) and then make them [Brain Imaging Data Structure](http://bids.neuroimaging.io/) compliant.
 The user specify how the files should be read into a directory. Then the tool scan all the files and move them into the right directories.
 
 ###### Input
