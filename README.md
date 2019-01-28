@@ -13,6 +13,7 @@ A `.JSON` configuration file explaining how the filenames should be read.
 ###### Output
 
 A directory as specified by the BIDS standard.
+[https://github.com/bids-standard/bids-validator](BIDS-validator) is used to check the conformity of the outputwith BIDS standard.
 
 ###### Example
 
@@ -57,7 +58,3 @@ MyDataset/
 ###### with pip
 
 ###### with singularity
-
-## bids-validator
-
-You can run the [https://github.com/bids-standard/bids-validator](BIDS-validator) to check your directory.
