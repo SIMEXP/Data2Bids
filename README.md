@@ -48,15 +48,13 @@ MyDataset/
         └── adhd_41578_BL00_RSFMRI_002.nii
 ```
 
+## Usage
+
 ## Install
 
 ###### with pip
 
 ###### with singularity
-
-## Introduction
-
-## Usage
 
 ## bids-validator
 
