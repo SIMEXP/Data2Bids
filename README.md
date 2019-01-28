@@ -13,7 +13,7 @@ A `.JSON` configuration file explaining how the filenames should be read.
 ###### Output
 
 A directory as specified by the BIDS standard.
-[https://github.com/bids-standard/bids-validator](BIDS-validator) is used to check the conformity of the outputwith BIDS standard.
+[BIDS validator](https://github.com/bids-standard/bids-validator) is used to check the conformity of the outputwith BIDS standard.
 
 ###### Example
 
