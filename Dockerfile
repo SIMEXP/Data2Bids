@@ -2,9 +2,12 @@ FROM python:3.6.7
 
 LABEL maintainer=Loic Tetrel <loic.tetrel.pro@gmail.com>
 
-RUN apt-get update && apt-get install -y \
-	numpy \
-	nibabel	
-COPY raw2bids.py /
+USER jovyan
 
-CMD python raw2bids.py
+RUN pip3 install numpy \
+	nibabel	\
+	data2bids
+
+COPY . /home/jovyan
+
+CMD data2bids
