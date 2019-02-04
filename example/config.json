@@ -1,0 +1,50 @@
+{"dataFormat" : ".mnc"
+, "compress" : false
+, "repetitionTimeInSec" : 2
+, "delayTimeInSec" : 0.06
+, "anat": {"left" : "_"
+            , "right" : "_"
+            , "content" : [  ["T1w", "adniT1"]
+                            ,["T2w", ""]
+                            ,["T1rho", ""]
+                            ,["T1map", ""]
+                            ,["T2map", ""]
+                            ,["T2star", ""]
+                            ,["FLAIR", ""]
+                            ,["FLASH", ""]
+                            ,["PD", ""]
+                            ,["PDmap", ""]
+                            ,["PDT2", ""]
+                            ,["inplaneT1", ""]
+                            ,["inplaneT2", ""]
+                            ,["angio", ""] ]
+            }   
+, "func": {"left" : "_"
+            , "right" : "_"
+            , "content" : [   ["bold","Resting"]
+                            , ["cbv",""] ]
+            }
+, "func.task": {"left" : "_"
+            , "right" : "_"
+            , "content" : [ ["rest","Resting"] ]
+            }
+, "sessLabel" : {"left" : "_.*?"
+                , "right" : "_"
+                , "content" :   ["WA00"
+                                , "BL00"
+                                , "EN00"
+                                , "FU03"
+                                , "FU12"
+                                , "FU24"
+                                , "FU36"
+                                , "FU48"]
+                }
+, "runIndex" : {"left" : "_"
+                , "right" : "."
+                , "content" : ["[0-9]{3}"]
+                }
+, "partLabel" : {"left" : "_"
+                , "right" : "_"
+                , "content" : ["[0-9]{6}"]
+                }
+}

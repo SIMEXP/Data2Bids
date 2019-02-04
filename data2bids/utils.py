@@ -6,6 +6,7 @@ Created on Mon Jan 28 09:55:12 2019
 @author: ltetrel
 """
 from pathlib import Path
+import numpy as np
 
 # tree shell-like in python from
 # (stackoverflow.com/questions/9727673/list-directory-tree-structure-in-python)
