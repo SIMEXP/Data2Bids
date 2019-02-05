@@ -84,7 +84,7 @@ Everything shoud be in a list. For structural mri `anat`, functionnal mri `func`
 
 ## Usage
 
-If you have your configuration file `config.json` in the directory `myFmriData` where your data is just use:
+If you have your configuration file `config.json` in the directory `myFmriData` where your data is just do:
 
 ```
 cd myFmriData
