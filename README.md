@@ -50,7 +50,7 @@ MyDataset/
         |
         └── adhd_41578_BL00_RSFMRI_002.nii
 ```
-###### Heuristic
+## Heuristic
 
 The package is using heuristics on the filenames to see how files should be reorganized.
 You will first probably need to write your own configuration file.
