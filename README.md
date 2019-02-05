@@ -72,6 +72,12 @@ For example with `adhd_41578_NAPBL00_RSFMRI_001.mnc` if you want to match:
 
 Everything shoud be in a list. For structural mri `anat`, functionnal mri `func` and tasks `func.task`, we use a sub-list to indentify the image sub-type (to differentiate `T1w` and `T2w` for example).
 
+## Dependencies
+
+[BIDS validator](https://github.com/bids-standard/bids-validator)
+nibabel
+numpy
+
 ## Install
 
 ###### with pip
