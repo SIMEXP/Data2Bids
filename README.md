@@ -74,9 +74,9 @@ Everything shoud be in a list. For structural mri `anat`, functionnal mri `func`
 
 ## Dependencies
 
-[BIDS validator](https://github.com/bids-standard/bids-validator)
-nibabel
-numpy
+* [BIDS validator](https://github.com/bids-standard/bids-validator)
+* nibabel
+* numpy
 
 ## Install
 
