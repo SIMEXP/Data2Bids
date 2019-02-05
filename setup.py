@@ -13,5 +13,5 @@ setup(name='data2bids',
           'nibabel',
           'numpy',
       ],
-      include_package_data = True,
+      include_package_data=True,
       zip_safe=False)

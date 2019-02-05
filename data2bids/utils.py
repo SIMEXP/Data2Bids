@@ -10,7 +10,7 @@ import numpy as np
 
 # tree shell-like in python from
 # (stackoverflow.com/questions/9727673/list-directory-tree-structure-in-python)
-class DisplayablePath(object):
+class DisplayablePath():
     display_filename_prefix_middle = '├──'
     display_filename_prefix_last = '└──'
     display_parent_prefix_middle = '    '
@@ -56,7 +56,7 @@ class DisplayablePath(object):
             count += 1
 
     @classmethod
-    def _default_criteria(cls, path):
+    def _default_criteria(cls):
         return True
 
     def displayable(self):
@@ -81,15 +81,20 @@ class DisplayablePath(object):
 
 def tree(path):
     paths = DisplayablePath.make_tree(Path(path))
-    for path in paths:
-        print(path.displayable())
-        
+    for path_to_display in paths:
+        print(path_to_display.displayable())
 
-def rotX(alpha):
-    return np.array([[1,0,0],[0, np.cos(alpha), np.sin(alpha)], [0, -np.sin(alpha), np.cos(alpha)]])
+def rot_x(alpha):
+    return np.array([[1, 0, 0]
+                     , [0, np.cos(alpha), np.sin(alpha)]
+                     , [0, -np.sin(alpha), np.cos(alpha)]])
 
-def rotY(alpha):
-    return np.array([[np.cos(alpha), 0, -np.sin(alpha)],[0, 1, 0], [np.sin(alpha), 0, np.cos(alpha)]])
+def rot_y(alpha):
+    return np.array([[np.cos(alpha), 0, -np.sin(alpha)]
+                     , [0, 1, 0]
+                     , [np.sin(alpha), 0, np.cos(alpha)]])
 
-def rotZ(alpha):
-    return np.array([[np.cos(alpha), np.sin(alpha), 0],[-np.sin(alpha), np.cos(alpha), 0], [0, 0, 1]])
+def rot_z(alpha):
+    return np.array([[np.cos(alpha), np.sin(alpha), 0]
+                     , [-np.sin(alpha), np.cos(alpha), 0]
+                     , [0, 0, 1]])
