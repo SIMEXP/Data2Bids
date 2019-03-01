@@ -56,7 +56,7 @@ class DisplayablePath():
             count += 1
 
     @classmethod
-    def _default_criteria(cls):
+    def _default_criteria(cls, path):
         return True
 
     def displayable(self):

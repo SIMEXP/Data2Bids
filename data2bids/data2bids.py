@@ -58,12 +58,10 @@ class Data2Bids():
             # Checking if a config.json is present
             if os.path.isfile(os.path.join(os.getcwd(), "config.json")):
                 self._config_path = os.path.join(os.getcwd(), "config.json")
-            # Otherwise taking the default config
-            else:
-                self._config_path = os.path.join(os.path.dirname(__file__), "config.json")
         else:
             self._config_path = config_path
-
+        
+        assert config_path is not None, "Please provide config file"
         self._set_config()
 
     def get_bids_dir(self):
@@ -119,9 +117,67 @@ class Data2Bids():
             subprocess.check_call(['bids-validator', self._bids_dir])
         except FileNotFoundError:
             print("bids-validator does not appear to be installed")
+            
+    def description_dump(self):
+        with open(self._bids_dir + "/dataset_description.json", 'w') as fst:
+            data = {'Name': self._dataset_name,
+                    'BIDSVersion': self._bids_version}
+            json.dump(data, fst, ensure_ascii=False)
+    
+    def bold_dump(self, dst_file_path, new_name, task_label_match):
+        with open(dst_file_path + new_name + ".json", 'w') as fst:
+            data = {'RepetitionTime': float(self._config["repetitionTimeInSec"]),
+                    'TaskName': task_label_match,
+                    'DelayTime' : float(self._config["delayTimeInSec"])}
+            json.dump(data, fst, ensure_ascii=False)
+    
+    def to_NIfTI(self, src_file_path, dst_file_path, new_name):
+        # loading the original image
+        nib_img = nib.load(src_file_path)
+        nib_affine = np.array(nib_img.affine)
+        nib_data = np.array(nib_img.dataobj)
 
+        # create the nifti1 image
+        # if minc format, invert the data and change the affine transformation
+        # there is also an issue on minc headers, TO CHECK...
+        if self._config["dataFormat"] == ".mnc":
+            if len(nib_img.shape) > 3:
+                nib_affine[0:3, 0:3] = nib_affine[0:3, 0:3] \
+                    @ utils.rot_z(np.pi/2) \
+                    @ utils.rot_y(np.pi) \
+                    @ utils.rot_x(np.pi/2)
+                nib_data = nib_data.T
+                nib_data = np.swapaxes(nib_data, 0, 1)
+
+                nifti_img = nib.Nifti1Image(nib_data, nib_affine, nib_img.header)
+                nifti_img.header.set_xyzt_units(xyz="mm", t="sec")
+                zooms = np.array(nifti_img.header.get_zooms())
+                zooms[3] = self._config["repetitionTimeInSec"]
+                nifti_img.header.set_zooms(zooms)
+            elif len(nib_img.shape) == 3:
+                nifti_img = nib.Nifti1Image(nib_data, nib_affine, nib_img.header)
+                nifti_img.header.set_xyzt_units(xyz="mm")
+        else:
+            nifti_img = nib.Nifti1Image(nib_data, nib_affine, nib_img.header)
+
+        #saving the image
+        nib.save(nifti_img, dst_file_path + new_name + ".nii.gz")
+    
+    def copy_NIfTI(self, src_file_path, dst_file_path, new_name):
+        shutil.copy(src_file_path, dst_file_path + new_name + ".nii")
+        #compression just if .nii files
+        if self._config["compress"] is True:
+            with open(dst_file_path + new_name + ".nii", 'rb') as f_in:
+                with gzip.open(dst_file_path + new_name + ".nii.gz", 'wb') as f_out:
+                    shutil.copyfileobj(f_in, f_out)
+            os.remove(dst_file_path + new_name + ".nii")
+    
+    def maybe_create_BIDS_dir(self):
+        if os.path.exists(self._bids_dir):
+            shutil.rmtree(self._bids_dir)
+        os.makedirs(self._bids_dir)
+    
     def run(self):
-
         # First we check that every parameters are configured
         if (self._data_dir is not None
                 and self._config_path is not None
@@ -138,24 +194,11 @@ class Data2Bids():
             print(self._bids_dir)
             print("\n")
 
-            # Create the output BIDS directory
-            if os.path.exists(self._bids_dir):
-                shutil.rmtree(self._bids_dir)
-            os.makedirs(self._bids_dir)
-
-            # What is the base format to convert to
-            curr_ext = self._config["dataFormat"]
-            compress = self._config["compress"]
-
-            # delay time in TR unit (if delay_time = 1, delay_time = repetition_time)
-            repetition_time = self._config["repetitionTimeInSec"]
-            delay_time = self._config["delayTimeInSec"]
+            # Maybe create the output BIDS directory
+            self.maybe_create_BIDS_dir()
 
             #dataset_description.json must be included in the folder root foolowing BIDS specs
-            with open(self._bids_dir + "/dataset_description.json", 'w') as fst:
-                data = {'Name': self._dataset_name,
-                        'BIDSVersion': self._bids_version}
-                json.dump(data, fst, ensure_ascii=False)
+            self.description_dump()
 
             # now we can scan all files and rearrange them
             for root, _, files in os.walk(self._data_dir):
@@ -170,7 +213,7 @@ class Data2Bids():
                     new_name = None
 
                     # if the file doesn't match the extension, we skip it
-                    if not re.match(".*?" + curr_ext, file):
+                    if not re.match(".*?" + self._config["dataFormat"], file):
                         print("Warning : Skipping %s" %src_file_path)
                         continue
 
@@ -233,47 +276,12 @@ class Data2Bids():
                         os.makedirs(dst_file_path)
 
                     # finally, if the file is not nifti, we convert it using nibabel
-                    if curr_ext != ".nii" or curr_ext != ".nii.gz":
-                        # loading the original image
-                        nib_img = nib.load(src_file_path)
-                        nib_affine = np.array(nib_img.affine)
-                        nib_data = np.array(nib_img.dataobj)
-
-                        # create the nifti1 image
-                        # if minc format, invert the data and change the affine transformation
-                        # there is also an issue on minc headers, TO CHECK...
-                        if curr_ext == ".mnc":
-                            if len(nib_img.shape) > 3:
-                                nib_affine[0:3, 0:3] = nib_affine[0:3, 0:3] \
-                                    @ utils.rot_z(np.pi/2) \
-                                    @ utils.rot_y(np.pi) \
-                                    @ utils.rot_x(np.pi/2)
-                                nib_data = nib_data.T
-                                nib_data = np.swapaxes(nib_data, 0, 1)
-
-                                nifti_img = nib.Nifti1Image(nib_data, nib_affine, nib_img.header)
-                                nifti_img.header.set_xyzt_units(xyz="mm", t="sec")
-                                zooms = np.array(nifti_img.header.get_zooms())
-                                zooms[3] = repetition_time
-                                nifti_img.header.set_zooms(zooms)
-                            elif len(nib_img.shape) == 3:
-                                nifti_img = nib.Nifti1Image(nib_data, nib_affine, nib_img.header)
-                                nifti_img.header.set_xyzt_units(xyz="mm")
-                        else:
-                            nifti_img = nib.Nifti1Image(nib_data, nib_affine, nib_img.header)
-
-                        #saving the image
-                        nib.save(nifti_img, dst_file_path + new_name + ".nii.gz")
+                    if self._config["dataFormat"] != ".nii" or self._config["dataFormat"] != ".nii.gz":
+                        self.to_NIfTI(src_file_path, dst_file_path, new_name)
 
                     # if it is already a nifti file, no need to convert it so we just copy rename
                     else:
-                        shutil.copy(src_file_path, dst_file_path + new_name + ".nii")
-                        #compression just if .nii files
-                        if compress is True:
-                            with open(dst_file_path + new_name + ".nii", 'rb') as f_in:
-                                with gzip.open(dst_file_path + new_name + ".nii.gz", 'wb') as f_out:
-                                    shutil.copyfileobj(f_in, f_out)
-                            os.remove(dst_file_path + new_name + ".nii")
+                        self.copy_NIfTI(src_file_path, dst_file_path, new_name)
 
                     # finally, if it is a bold experiment, we need to add the JSON file
                     if data_type_match == "bold":
@@ -282,11 +290,7 @@ class Data2Bids():
                         #nib_img = nib.load(src_file_path)
                         #TR = nib_img.header.get_zooms()[3]
                         try:
-                            with open(dst_file_path + new_name + ".json", 'w') as fst:
-                                data = {'RepetitionTime': float(repetition_time),
-                                        'TaskName': task_label_match,
-                                        'DelayTime' : float(delay_time)}
-                                json.dump(data, fst, ensure_ascii=False)
+                            self.bold_dump(dst_file_path, new_name, task_label_match)
                         except FileNotFoundError:
                             print("Cannot write %s" %(dst_file_path + new_name + ".nii.gz"))
                             continue
@@ -299,3 +303,11 @@ class Data2Bids():
 
         else:
             print("Warning: No parameters are defined !")
+            
+#def main():
+#    data2bids = Data2Bids(input_dir="/home/ltetrel/Documents/data/preventadRaw"
+#                          , config="/home/ltetrel/Documents/work/Data2Bids/example/config.json")
+#    data2bids.run()
+#    
+#if __name__ == '__main__':
+#    main()
