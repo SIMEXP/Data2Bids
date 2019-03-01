@@ -21,13 +21,13 @@ A directory `MyDataset` with the following files :
 ```
 MyDataset/
 |
-└── adhd_41278_FU12_T1_001.mnc
+└── adhd_41278_FU12_T1_001.nii
 |
-└── adhd_41278_FU24_T1_001.mnc
+└── adhd_41278_FU24_T1_001.nii
 |
-└── adhd_41578_BL00_RSFMRI_001.mnc
+└── adhd_41578_BL00_RSFMRI_001.nii
 |
-└── adhd_41578_BL00_RSFMRI_002.mnc
+└── adhd_41578_BL00_RSFMRI_002.nii
 ```
 
 Will be transformed as :
@@ -39,16 +39,16 @@ MyDataset/
 |   |
 |   └── anat/
 |       |
-|       └── adhd_41278_FU12_T1_001.nii
+|       └── adhd_41278_FU12_T1_001.nii.gz
 |       |
-|       └── adhd_41278_FU24_T1_001.nii
+|       └── adhd_41278_FU24_T1_001.nii.gz
 └── sub-41578/
     |
     └── func/
         |
-        └── adhd_41578_BL00_RSFMRI_001.nii
+        └── adhd_41578_BL00_RSFMRI_001.nii.gz
         |
-        └── adhd_41578_BL00_RSFMRI_002.nii
+        └── adhd_41578_BL00_RSFMRI_002.nii.gz
 ```
 ## Heuristic
 
