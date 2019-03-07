@@ -1,0 +1,52 @@
+version: 2
+
+jobs:
+  build:
+    docker:
+      - image: python:3.6.8
+    steps:
+      - checkout
+      - run: pip install -r requirements.txt 
+      # cache the installed libraries
+      - save_cache:
+          key: pip-packages-v1-{{ .Branch }}-{{ checksum "requirements.txt" }} 
+          paths:
+            - "/usr/local/bin" 
+            - "/usr/local/lib/python3.6/site-packages"
+
+  test-sup:
+    docker:
+      - image: python:3.6.8
+    steps:
+      - checkout
+      # use the saved cache from the build to avoid reinstalling the libs
+      - restore_cache:
+          keys:
+            - pip-packages-v1-{{ .Branch }}-{{ checksum "requirements.txt" }}
+      - run:
+          name: sup
+          command: pytest ./tests/test_sup.py
+  test-add:
+    docker:
+      - image: python:3.6.8
+    steps:
+      - checkout
+      # use the saved cache from the build to avoid reinstalling the libs
+      - restore_cache:
+          keys:
+            - pip-packages-v1-{{ .Branch }}-{{ checksum "requirements.txt" }}
+      - run:
+          name: add 
+          command: pytest ./tests/test_add.py
+
+workflows:
+  version: 2
+  tests:
+    jobs:
+      - build
+      - test-add:
+          requires:
+            - build
+      - test-sup:
+          requires:
+            - build
