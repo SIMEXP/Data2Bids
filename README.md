@@ -99,6 +99,6 @@ data2bids
 
 The resulting bids directory will be `myFmriData/myFmriData_BIDS`.
 
-If no configuration file is given, it will load https://github.com/SIMEXP/Data2Bids/blob/master/example/config.json. You can also use `-c` to provide a path to the configuration.
+You can also use `-c` to provide a path to the configuration.
 
 To change the input directory use `-d`, you can also change the output bids directory with `-o`.
