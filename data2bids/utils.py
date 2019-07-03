@@ -56,8 +56,12 @@ class DisplayablePath():
             count += 1
 
     @classmethod
-    def _default_criteria(cls, path):
-        return True
+    def _default_criteria(cls, infile):
+        import os
+        if os.path.isdir(infile):
+            return True
+        else:
+            return False
 
     def displayable(self):
         if self.parent is None:
