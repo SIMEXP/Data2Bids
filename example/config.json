@@ -1,5 +1,5 @@
 {"dataFormat" : ".mnc"
-, "compress" : false
+, "compress" : true
 , "repetitionTimeInSec" : 2
 , "delayTimeInSec" : 0.06
 , "anat": {"left" : "_"
@@ -40,7 +40,7 @@
                                 , "FU48"]
                 }
 , "runIndex" : {"left" : "_"
-                , "right" : "."
+                , "right" : "\\."
                 , "content" : ["[0-9]{3}"]
                 }
 , "partLabel" : {"left" : "_"

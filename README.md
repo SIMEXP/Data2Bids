@@ -3,7 +3,9 @@
 Data2Bids is a **python3** package that converts fmri files from extension supported by [nibabel](http://nipy.org/nibabel/api.html) into [NIfTI](https://nifti.nimh.nih.gov/nifti-1/) and then make them [Brain Imaging Data Structure](http://bids.neuroimaging.io/) compliant.
 The user specify how the files should be read into a directory. Then the tool scan all the files and move them into the right directories.
 
-*Disclaimer*: This tool is intended to convert data **other than** [DICOM](https://www.dicomstandard.org/about/). If you have DICOM data, please use more recognized tools as [heudiconv](https://github.com/nipy/heudiconv) or [Dcm2Bids](https://github.com/cbedetti/Dcm2Bids)
+*Disclaimer*: This tool is intended to convert data **other than** [DICOM](https://www.dicomstandard.org/about/). If you have DICOM data, please use more recognized tools as [heudiconv](https://github.com/nipy/heudiconv) or [Dcm2Bids](https://github.com/cbedetti/Dcm2Bids).
+It also does not handle properly the headers of the images (we rely entirely on nibabel).
+Finally, it is not handle well too complicated raw data structures, for this case you should use a GUI converter like [bidscoin](https://github.com/Donders-Institute/bidscoin).
 
 ###### Input
 
@@ -67,11 +69,12 @@ The remainind fields correspond to bids structure. For each of them you need to 
 
 For example with `adhd_41578_NAPBL00_RSFMRI_001.mnc` if you want to match:
 * the fmri field, you need to specify the left and right delimiter `_` and the content `RSFMRI`.
-* the run number, the left delimiter is `_` but the right is `.` with content `[0-9]{3}` which means match exactly 3 integers.
+* the run number, the left delimiter is `_` but the right is `\\.` with content `[0-9]{3}` which means match exactly 3 integers. (\*)
 * the session `BL00`, you can use left delimiter `_.*?` (match a `_` and everything after), right delimiter `_` with content `BL00`.
 
 Everything shoud be in a list. For structural mri `anat`, functionnal mri `func` and tasks `func.task`, we use a sub-list to indentify the image sub-type (to differentiate `T1w` and `T2w` for example).
 
+(\*) Do not forget to use an escape character to match for example a "."
 ## Dependencies
 
 * [BIDS validator](https://github.com/bids-standard/bids-validator)

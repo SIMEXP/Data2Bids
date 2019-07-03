@@ -29,9 +29,6 @@ class Data2Bids():
         self.set_config_path(config)
         self.set_bids_dir(output_dir)
 
-    def get_data_dir(self):
-        return self._data_dir
-
     def set_data_dir(self, data_dir):
         if data_dir is None:
             self._data_dir = os.getcwd()
@@ -40,15 +37,17 @@ class Data2Bids():
 
         self._dataset_name = os.path.basename(self._data_dir)
 
-    def get_config(self):
-        return self._config
-
-    def get_config_path(self):
-        return self._config_path
-
     def _set_config(self):
         with open(self._config_path, 'r') as fst:
-            self._config = json.load(fst)
+            data = fst.read()
+            try:
+                self._config = json.loads(data)
+            except json.JSONDecodeError as exc:
+                if exc.msg == 'Invalid \\escape':
+                    data = data[:exc.pos] + '\\' + data[exc.pos:]
+                    self._config = json.loads(data)
+                else:
+                    raise
 
     def set_config(self, config):
         self._config = config
@@ -61,11 +60,8 @@ class Data2Bids():
         else:
             self._config_path = config_path
         
-        assert config_path is not None, "Please provide config file"
+        assert self._config_path is not None, "Please provide config file"
         self._set_config()
-
-    def get_bids_dir(self):
-        return self._bids_dir
 
     def set_bids_dir(self, bids_dir):
         if bids_dir is None:
@@ -76,9 +72,6 @@ class Data2Bids():
                 print("Error: Please provice input data directory if no BIDS directory...")
         else:
             self._bids_dir = bids_dir
-
-    def get_bids_version(self):
-        return self._bids_version
 
     def match_regexp(self, config_regexp, filename, subtype=False):
         delimiter_left = config_regexp["left"]
@@ -303,11 +296,3 @@ class Data2Bids():
 
         else:
             print("Warning: No parameters are defined !")
-            
-#def main():
-#    data2bids = Data2Bids(input_dir="/home/ltetrel/Documents/data/preventadRaw"
-#                          , config="/home/ltetrel/Documents/work/Data2Bids/example/config.json")
-#    data2bids.run()
-#    
-#if __name__ == '__main__':
-#    main()
