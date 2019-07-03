@@ -5,7 +5,7 @@ The user specify how the files should be read into a directory. Then the tool sc
 
 *Disclaimer*: This tool is intended to convert data **other than** [DICOM](https://www.dicomstandard.org/about/). If you have DICOM data, please use more recognized tools as [heudiconv](https://github.com/nipy/heudiconv) or [Dcm2Bids](https://github.com/cbedetti/Dcm2Bids).
 It also does not handle properly the headers of the images (we rely entirely on nibabel).
-Finally, it is not handle well too complicated raw data structures, for this case you should use a GUI converter like [bidscoin](https://github.com/Donders-Institute/bidscoin).
+Finally, do not use this tool for too complicated raw data structures, in this case you should use a GUI converter like [bidscoin](https://github.com/Donders-Institute/bidscoin).
 
 ###### Input
 
